@@ -8,5 +8,15 @@
     "duration": 50,
     "status": "Done",
     "author": "EithanSanchezFilipe"
+  },
+  {
+    "id": "35d2e3f6-a6ea-485b-8674-758abcac7d3d",
+    "type": "commitless",
+    "name": "doc(user stories): analyze and create user stories",
+    "description": "analyze and create user stories (Définir le dossier des fichier audios, afficher la liste des fichiers audio, afficher les métadonnées des fichiers audio, lancer la lecture d'un fichier)",
+    "date": "2025-11-03T08:00:00.000Z",
+    "duration": 60,
+    "status": "WIP",
+    "author": "EithanSanchezFilipe"
   }
 ]
