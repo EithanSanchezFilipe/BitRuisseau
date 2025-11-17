@@ -1,6 +1,11 @@
-﻿/*#if (SampleContent)*/
+/*#if (SampleContent)*/
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+* {
+    margin: 0px;
+    padding: 0px;
+    color: rgb(219, 228, 233);
 }
 
 a, .btn-link {
@@ -70,7 +75,12 @@ h1:focus {
 .status-bar-safe-area {
     display: none;
 }
-
+.bg-background-primary {
+    background-color:rgb(14, 17, 19);
+}
+.main-page{
+    display:flex;
+}
 @supports (-webkit-touch-callout: none) {
     .status-bar-safe-area {
         display: flex;

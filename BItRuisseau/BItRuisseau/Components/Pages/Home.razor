@@ -1,5 +1,50 @@
 ﻿@page "/"
+@inject CommunityToolkit.Maui.Storage.IFolderPicker FolderPicker
 
-<h1>Hello, world!</h1>
+<header>
+	<h1>MediaPlayer</h1>
+</header>
+<div class="main-page">
+	<aside class="sidebar">
+		<ul>
+			@foreach (string student in students)
+			{
+				<li>@student</li>
+			}
+		</ul>
+	</aside>
+	<div></div>
+	@if (!string.IsNullOrEmpty(selectedFolder))
+	{
+		<p>Selected folder: @selectedFolder</p>
+	}
+</div>
 
-Welcome to your new app.
+@code {
+	List<string> students = new() { "Eithan", "Mathis", "Emma" };
+	string selectedFolder = string.Empty;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await PickFolderAsync();
+	}
+
+	private async Task PickFolderAsync()
+	{
+		try
+		{
+			var result = await FolderPicker.PickAsync();
+			result.EnsureSuccess();
+			students.Add(result.Folder.Name);
+
+		}
+		catch(Exception e)
+		{
+
+		}
+	}
+	private GetSongs()
+	{
+		
+	}
+}

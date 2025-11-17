@@ -1,0 +1,11 @@
+.sidebar {
+    border-right: 1px solid rgb(128, 128, 128);
+    height: 90vh;
+    max-width: 15%;
+    min-width: 15%;
+}
+header {
+    border-bottom: 1px solid rgb(128, 128, 128);
+    min-height: 10vh;
+    align-content:center;
+}
