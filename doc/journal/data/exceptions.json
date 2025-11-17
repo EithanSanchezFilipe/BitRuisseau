@@ -18,5 +18,15 @@
     "duration": 60,
     "status": "WIP",
     "author": "EithanSanchezFilipe"
+  },
+  {
+    "id": "fd54db89-c558-4f7b-9db9-5e030cf44088",
+    "type": "commitless",
+    "name": "Mise à jour de Visual Studio",
+    "description": "",
+    "date": "2025-11-17T07:13:00.000Z",
+    "duration": 10,
+    "status": "Done",
+    "author": "EithanSanchezFilipe"
   }
 ]
