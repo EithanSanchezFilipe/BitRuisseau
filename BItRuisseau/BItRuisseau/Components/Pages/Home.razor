@@ -2,49 +2,90 @@
 @inject CommunityToolkit.Maui.Storage.IFolderPicker FolderPicker
 
 <header>
-	<h1>MediaPlayer</h1>
+    <h1>MediaPlayer</h1>
 </header>
+
 <div class="main-page">
-	<aside class="sidebar">
-		<ul>
-			@foreach (string student in students)
-			{
-				<li>@student</li>
-			}
-		</ul>
-	</aside>
-	<div></div>
-	@if (!string.IsNullOrEmpty(selectedFolder))
-	{
-		<p>Selected folder: @selectedFolder</p>
-	}
+    <aside class="sidebar">
+        <ul>
+            @foreach (var student in students)
+            {
+                <li>@student</li>
+            }
+        </ul>
+    </aside>
+
+    <div></div>
+
+    @if (!string.IsNullOrWhiteSpace(settings?.MusicFolderPath))
+    {
+        <p>Selected folder: @settings.MusicFolderPath</p>
+    }
 </div>
 
 @code {
-	List<string> students = new() { "Eithan", "Mathis", "Emma" };
-	string selectedFolder = string.Empty;
+    List<string> students = new() { "Eithan", "Mathis", "Emma" };
 
-	protected override async Task OnInitializedAsync()
-	{
-		await PickFolderAsync();
-	}
+    Settings settings;
 
-	private async Task PickFolderAsync()
-	{
-		try
-		{
-			var result = await FolderPicker.PickAsync();
-			result.EnsureSuccess();
-			students.Add(result.Folder.Name);
+    string SETTINGS_FILE = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "BitRuisseau",
+        "AppSettings.json"
+    );
 
-		}
-		catch(Exception e)
-		{
+    protected override async Task OnInitializedAsync()
+    {
+        if (File.Exists(SETTINGS_FILE))
+        {
+            try
+            {
+                string json = File.ReadAllText(SETTINGS_FILE);
+                settings = JsonSerializer.Deserialize<Settings>(json);
+            }
+            catch
+            {
+                settings = new Settings();
+            }
+        }
+        else
+        {
+            settings = new Settings();
+        }
 
-		}
-	}
-	private GetSongs()
-	{
-		
-	}
+        if (string.IsNullOrWhiteSpace(settings.MusicFolderPath))
+        {
+            var result = await PickFolderAsync();
+            if (result != null)
+            {
+                settings.MusicFolderPath = result.Folder.Path;
+                SaveSettings();
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task<FolderPickerResult?> PickFolderAsync()
+    {
+        try
+        {
+            FolderPickerResult result = await FolderPicker.PickAsync();
+            result.EnsureSuccess();
+            return result;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private void SaveSettings()
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(SETTINGS_FILE)!);
+        File.WriteAllText(SETTINGS_FILE, JsonSerializer.Serialize(settings));
+    }
+
+    private void GetSongs(string path)
+    {
+    }
 }
