@@ -15,7 +15,7 @@
                 <ul>
                     @foreach (var song in songs)
                     {
-                        <li @onclick="() => PlaySong(song)">
+                        <li @onclick="() => PlaySong(song)" style="cursor:pointer;@(currentSong == song ? "font-weight:bold;" : "")">
                             @song.Title
                         </li>
                     }
@@ -23,18 +23,33 @@
             </aside>
 
             <div class="player">
-                @if (currentSong != null && !string.IsNullOrEmpty(currentSong.FilePath))
+                @if (currentSong != null)
                 {
                     <p>Lecture en cours : @(string.IsNullOrEmpty(currentSong.Title) ? Path.GetFileName(currentSong.FilePath) : currentSong.Title)</p>
-                    <audio controls autoplay>
-                        <source src="@($"file:///{currentSong.FilePath.Replace("\\", "/")}")" type="audio/mpeg" />
-                    </audio>
+                    <p>
+                        Status:
+                        @if (IsPlaying)
+                        {
+                            <span>🎵 Playing</span>
+                        }
+                        else if (IsPaused)
+                        {
+                            <span>⏸ Paused</span>
+                        }
+                        else
+                        {
+                            <span>■ Stopped</span>
+                        }
+                    </p>
+
+                    <button @onclick="() => PlaySong(currentSong)" disabled="@IsPlaying">Play</button>
+                    <button @onclick="PauseSong" disabled="@(!IsPlaying)">Pause</button>
+                    <button @onclick="StopSong" disabled="@IsStopped">Stop</button>
                 }
                 else
                 {
                     <p>Sélectionnez une musique pour jouer</p>
                 }
-
             </div>
         </div>
     }
@@ -43,6 +58,13 @@
 @code {
     private List<Music> songs = new();
     private Music currentSong;
+
+    private NAudio.Wave.IWavePlayer waveOut;
+    private NAudio.Wave.AudioFileReader audioFile;
+
+    private bool IsPlaying => waveOut?.PlaybackState == NAudio.Wave.PlaybackState.Playing;
+    private bool IsPaused => waveOut?.PlaybackState == NAudio.Wave.PlaybackState.Paused;
+    private bool IsStopped => waveOut?.PlaybackState == NAudio.Wave.PlaybackState.Stopped || waveOut == null;
 
     protected override void OnInitialized()
     {
@@ -69,6 +91,47 @@
 
     private void PlaySong(Music song)
     {
-        currentSong = song;
+        try
+        {
+            if (IsPlaying && currentSong == song)
+                return;
+
+            StopSong();
+
+            currentSong = song;
+            audioFile = new NAudio.Wave.AudioFileReader(song.FilePath);
+            waveOut = new NAudio.Wave.WaveOutEvent();
+            waveOut.Init(audioFile);
+            waveOut.Play();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error playing {song.FilePath}: {ex.Message}");
+        }
+    }
+
+    private void PauseSong()
+    {
+        if (IsPlaying)
+        {
+            waveOut.Pause();
+        }
+    }
+
+    private void StopSong()
+    {
+        if (waveOut != null)
+        {
+            waveOut.Stop();
+            audioFile?.Dispose();
+            waveOut.Dispose();
+            audioFile = null;
+            waveOut = null;
+        }
+    }
+
+    public void Dispose()
+    {
+        StopSong();
     }
 }

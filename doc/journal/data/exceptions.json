@@ -35,8 +35,28 @@
     "name": "Améliorer le visuel (pas retenu)",
     "description": "Améliorer le visuel pour rendre l'application plus belle",
     "date": "2025-11-24T07:10:00.000Z",
+    "duration": 60,
+    "status": "Done",
+    "author": "EithanSanchezFilipe"
+  },
+  {
+    "id": "e7e0c7c6-8698-46ab-ac62-7cace476b48b",
+    "type": "commitless",
+    "name": "refactor(settings): add a settings service for all the actions so it simplier to implement the settings page",
+    "description": "",
+    "date": "2025-12-01T07:00:00.000Z",
+    "duration": 20,
+    "status": "Done",
+    "author": "EithanSanchezFilipe"
+  },
+  {
+    "id": "949a2725-ba96-4423-b641-8bbe33b902a5",
+    "type": "commitless",
+    "name": "feat(settings): add the settings page and restyle the app",
+    "description": "",
+    "date": "2025-12-01T09:11:00.000Z",
     "duration": 45,
     "status": "Done",
-    "author": "owner1"
+    "author": "EithanSanchezFilipe"
   }
 ]
