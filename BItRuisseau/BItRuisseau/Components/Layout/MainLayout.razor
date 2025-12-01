@@ -1,9 +1,31 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <main class="bg-background-primary vh-100">
-        <article>
+<div class="app-container">
+    <header>
+        <h1>MediaPlayer</h1>
+        <button @onclick="GoToSettings">⚙️ Settings</button>
+    </header>
+
+    <div class="page-container">
+        <aside class="sidebar">
+            <ul>
+                <li>Eithan</li>
+                <li>Mathis</li>
+                <li>Emma</li>
+            </ul>
+        </aside>
+
+        <main>
             @Body
-        </article>
-    </main>
+        </main>
+    </div>
 </div>
+
+@code {
+    [Inject] NavigationManager Navigation { get; set; }
+
+    private void GoToSettings()
+    {
+        Navigation.NavigateTo("/settings");
+    }
+}

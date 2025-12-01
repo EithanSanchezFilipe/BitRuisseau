@@ -1,0 +1,23 @@
+﻿@page "/settings"
+@inject SettingsService SettingsService
+@inject NavigationManager Navigation
+
+<div class="settings-page">
+    <h1>Paramètres</h1>
+    <p>Dossier actuel : @SettingsService.Current.MusicFolderPath</p>
+    <button @onclick="ChangeFolder">Changer le dossier</button>
+    <button @onclick="GoHome">Retour à l'accueil</button>
+</div>
+
+@code {
+    private async Task ChangeFolder()
+    {
+        await SettingsService.PickMusicFolderAsync();
+        StateHasChanged();
+    }
+
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+}

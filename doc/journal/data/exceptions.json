@@ -28,5 +28,15 @@
     "duration": 10,
     "status": "Done",
     "author": "EithanSanchezFilipe"
+  },
+  {
+    "id": "0710df8f-861d-436c-86dd-e8464d13e807",
+    "type": "commitless",
+    "name": "Améliorer le visuel (pas retenu)",
+    "description": "Améliorer le visuel pour rendre l'application plus belle",
+    "date": "2025-11-24T07:10:00.000Z",
+    "duration": 45,
+    "status": "Done",
+    "author": "owner1"
   }
 ]
