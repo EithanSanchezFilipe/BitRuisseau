@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Maui;
+﻿using BItRuisseau.Services;
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
 using Microsoft.Extensions.Logging;
 
@@ -18,8 +19,10 @@ namespace BItRuisseau
 
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddSingleton<IFolderPicker>(FolderPicker.Default);
+            builder.Services.AddSingleton<SettingsService>();
+
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();
 #endif
 

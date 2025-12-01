@@ -1,9 +1,6 @@
-﻿namespace BItRuisseau.Models
-{
-    public class Settings
-    {
-        public string MusicFolderPath { get; set; } = string.Empty;
+﻿namespace BItRuisseau.Models;
 
-        public Settings() { }
-    }
+public class Settings
+{
+    public string MusicFolderPath { get; set; } = string.Empty;
 }

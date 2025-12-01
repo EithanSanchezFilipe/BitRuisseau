@@ -1,91 +1,22 @@
 ﻿@page "/"
-@inject CommunityToolkit.Maui.Storage.IFolderPicker FolderPicker
+@inject SettingsService SettingsService
 
-<header>
-    <h1>MediaPlayer</h1>
-</header>
-
-<div class="main-page">
-    <aside class="sidebar">
-        <ul>
-            @foreach (var student in students)
-            {
-                <li>@student</li>
-            }
-        </ul>
-    </aside>
-
-    <div></div>
-
-    @if (!string.IsNullOrWhiteSpace(settings?.MusicFolderPath))
+<div class="content-page">
+    @if (string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
     {
-        <p>Selected folder: @settings.MusicFolderPath</p>
+        <p>Aucun dossier configuré. Veuillez en choisir un…</p>
+        <button @onclick="SelectFolder">Choisir un dossier</button>
+    }
+    else
+    {
+        <p>Dossier choisi : @SettingsService.Current.MusicFolderPath</p>
     }
 </div>
 
 @code {
-    List<string> students = new() { "Eithan", "Mathis", "Emma" };
-
-    Settings settings;
-
-    string SETTINGS_FILE = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "BitRuisseau",
-        "AppSettings.json"
-    );
-
-    protected override async Task OnInitializedAsync()
+    private async Task SelectFolder()
     {
-        if (File.Exists(SETTINGS_FILE))
-        {
-            try
-            {
-                string json = File.ReadAllText(SETTINGS_FILE);
-                settings = JsonSerializer.Deserialize<Settings>(json);
-            }
-            catch
-            {
-                settings = new Settings();
-            }
-        }
-        else
-        {
-            settings = new Settings();
-        }
-
-        if (string.IsNullOrWhiteSpace(settings.MusicFolderPath))
-        {
-            var result = await PickFolderAsync();
-            if (result != null)
-            {
-                settings.MusicFolderPath = result.Folder.Path;
-                SaveSettings();
-                StateHasChanged();
-            }
-        }
-    }
-
-    private async Task<FolderPickerResult?> PickFolderAsync()
-    {
-        try
-        {
-            FolderPickerResult result = await FolderPicker.PickAsync();
-            result.EnsureSuccess();
-            return result;
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private void SaveSettings()
-    {
-        Directory.CreateDirectory(Path.GetDirectoryName(SETTINGS_FILE)!);
-        File.WriteAllText(SETTINGS_FILE, JsonSerializer.Serialize(settings));
-    }
-
-    private void GetSongs(string path)
-    {
+        await SettingsService.PickMusicFolderAsync();
+        StateHasChanged();
     }
 }
