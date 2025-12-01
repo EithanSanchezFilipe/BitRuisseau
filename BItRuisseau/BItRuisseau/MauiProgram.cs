@@ -20,6 +20,7 @@ namespace BItRuisseau
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddSingleton<IFolderPicker>(FolderPicker.Default);
             builder.Services.AddSingleton<SettingsService>();
+            builder.Services.AddSingleton<MusicService>();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();

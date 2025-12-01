@@ -1,5 +1,6 @@
 ﻿@page "/"
 @inject SettingsService SettingsService
+@inject MusicService MusicService
 
 <div class="content-page">
     @if (string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
@@ -9,14 +10,65 @@
     }
     else
     {
-        <p>Dossier choisi : @SettingsService.Current.MusicFolderPath</p>
+        <div class="music-player">
+            <aside class="music-list">
+                <ul>
+                    @foreach (var song in songs)
+                    {
+                        <li @onclick="() => PlaySong(song)">
+                            @song.Title
+                        </li>
+                    }
+                </ul>
+            </aside>
+
+            <div class="player">
+                @if (currentSong != null && !string.IsNullOrEmpty(currentSong.FilePath))
+                {
+                    <p>Lecture en cours : @(string.IsNullOrEmpty(currentSong.Title) ? Path.GetFileName(currentSong.FilePath) : currentSong.Title)</p>
+                    <audio controls autoplay>
+                        <source src="@($"file:///{currentSong.FilePath.Replace("\\", "/")}")" type="audio/mpeg" />
+                    </audio>
+                }
+                else
+                {
+                    <p>Sélectionnez une musique pour jouer</p>
+                }
+
+            </div>
+        </div>
     }
 </div>
 
 @code {
+    private List<Music> songs = new();
+    private Music currentSong;
+
+    protected override void OnInitialized()
+    {
+        LoadSongs();
+    }
+
     private async Task SelectFolder()
     {
-        await SettingsService.PickMusicFolderAsync();
-        StateHasChanged();
+        bool picked = await SettingsService.PickMusicFolderAsync();
+        if (picked)
+        {
+            LoadSongs();
+            StateHasChanged();
+        }
+    }
+
+    private void LoadSongs()
+    {
+        if (!string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
+        {
+            songs = MusicService.GetMusics(SettingsService.Current.MusicFolderPath);
+        }
+    }
+
+    private void PlaySong(Music song)
+    {
+        currentSong = song;
     }
 }

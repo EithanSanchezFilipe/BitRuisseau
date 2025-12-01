@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-
 <div class="app-container">
     <header>
         <h1>MediaPlayer</h1>
@@ -16,8 +15,12 @@
         </aside>
 
         <main>
-            @Body
+            @if (Body != null)
+            {
+                @Body
+            }
         </main>
+
     </div>
 </div>
 
