@@ -1,8 +1,12 @@
 ﻿@inherits LayoutComponentBase
+@inject PlayerService Player
+@inject NavigationManager Navigation
+@using InfiniLore.Lucide
+
 <div class="app-container">
     <header>
         <h1>MediaPlayer</h1>
-        <button @onclick="GoToSettings">⚙️ Settings</button>
+        <button @onclick="GoToSettings">Settings</button>
     </header>
 
     <div class="page-container">
@@ -20,15 +24,65 @@
                 @Body
             }
         </main>
-
     </div>
+
+    <footer class="bottom-player">
+        @if (Player.CurrentSong != null)
+        {
+            <div class="player-left">
+                <div class="album-art-placeholder">
+                    <LucideIcon Name="music" size="28" />
+                </div>
+                <div class="song-info">
+                    <div class="song-title">@Player.CurrentSong.Title.Shorten(50)</div>
+                    <div class="song-artist">@string.Join(", ",Player.CurrentSong.Author)</div>
+                    <div class="song-meta">@Player.CurrentSong.Year |  @Player.CurrentSong.Duration.ToString(@"mm\:ss")</div>
+                </div>
+            </div>
+
+            <div class="player-center">
+                <button @onclick="Player.PlayPrevious" aria-label="Previous song">
+                    <LucideIcon Name="arrow-left" />
+                </button>
+
+                @if (Player.IsPlaying)
+                {
+                    <button class="play-button" @onclick="Player.Pause" aria-label="Pause">
+                        <LucideIcon Name="pause" />
+                    </button>
+                }
+                else
+                {
+                    <button class="play-button" @onclick="() => Player.Play(Player.CurrentSong)" aria-label="Play">
+                        <LucideIcon Name="play" />
+                    </button>
+                }
+
+                <button @onclick="Player.PlayNext" aria-label="Next song">
+                    <LucideIcon Name="arrow-right" />
+                </button>
+            </div>
+        }
+        else
+        {
+            <span>Select a song to play</span>
+        }
+    </footer>
+
 </div>
 
 @code {
-    [Inject] NavigationManager Navigation { get; set; }
-
     private void GoToSettings()
     {
         Navigation.NavigateTo("/settings");
+    }
+    protected override void OnInitialized()
+    {
+        Player.OnSongChanged += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        Player.OnSongChanged -= StateHasChanged;
     }
 }

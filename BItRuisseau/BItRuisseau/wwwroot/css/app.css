@@ -17,6 +17,10 @@ html, body {
 }
 
 header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     height: 60px;
     display: flex;
     justify-content: space-between;
@@ -24,6 +28,7 @@ header {
     padding: 0 20px;
     border-bottom: 1px solid #555;
     background-color: #14181c;
+    z-index: 100;
 }
 
     header h1 {
@@ -45,7 +50,10 @@ header {
 
 .page-container {
     display: flex;
-    height: calc(100vh - 60px);
+    flex: 1;
+    margin-top: 60px;
+    margin-bottom: 70px;
+    overflow: hidden;
 }
 
 .sidebar {
@@ -53,6 +61,11 @@ header {
     background-color: #1a1d21;
     border-right: 1px solid #555;
     padding: 20px;
+    overflow-y: auto;
+    position: fixed;
+    top: 60px;
+    bottom: 70px;
+    left: 0;
 }
 
     .sidebar ul {
@@ -63,22 +76,72 @@ header {
     .sidebar li {
         margin: 10px 0;
         cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
     }
 
         .sidebar li:hover {
             background-color: #2c2f34;
-            padding-left: 5px;
+            padding-left: 10px;
         }
 
 main {
-    flex: 1;
     padding: 20px;
     overflow-y: auto;
+    flex: 1;
 }
 
-.content-page, .settings-page {
-    background-color: #0e1113;
-    height: 100%;
+.music-list-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.song-box {
+    background-color: #1a1d21;
+    border: 1px solid #2c2f34;
+    border-radius: 8px;
+    padding: 10px 10px 0 10px;
+    cursor: pointer;
+    transition: background-color .18s ease, transform .15s ease, box-shadow .18s ease, border-color .18s ease;
+    text-align: left;
+}
+
+    .song-box:hover {
+        background-color: #24272c;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+        border-color: #3f4550;
+    }
+
+    .song-box.active {
+        border-color: #ffffff;
+        background-color: #182331;
+        box-shadow: 0 0 12px rgba(27,110,194,0.3);
+    }
+
+.song-image-placeholder {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #2c2f34;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: #8f97a5;
+}
+
+.songTitle {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.artistName {
+    color: #9ba1b0;
+    font-size: 0.82rem;
 }
 
 button {
@@ -94,3 +157,120 @@ button {
     button:hover {
         background-color: #145a9e;
     }
+
+.bottom-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70px;
+    background-color: #14181c;
+    border-top: 1px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    z-index: 100;
+    position: relative;
+}
+
+.player-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: white;
+    position: absolute;
+    left: 20px;
+}
+
+.album-art-placeholder {
+    width: 50px;
+    height: 50px;
+    background-color: #2c2f34;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8f97a5;
+}
+
+.song-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-title {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #dbdee9;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.song-artist,
+.song-meta {
+    color: #9ba1b0;
+    font-size: 0.75rem;
+}
+
+.player-center {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+    .player-center button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .player-center button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+.play-button {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease;
+}
+
+    .play-button:hover:not(:disabled) {
+        background-color: #262626;
+    }
+
+.content-page, .settings-page {
+    background-color: #0e1113;
+    height: 100%;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #2c2f34;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #14181c;
+}
