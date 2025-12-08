@@ -16,14 +16,14 @@ namespace BItRuisseau.Services
 
             string[] extensions = new[] { ".mp3", ".wav", ".flac", ".m4a" };
 
-            var musics = Directory
+            List<Music> musics = Directory
                 .GetFiles(folderPath, "*.*", SearchOption.AllDirectories)
                 .Where(f => extensions.Contains(Path.GetExtension(f).ToLower()))
                 .Select(file =>
                 {
                     try
                     {
-                        var tagFile = TagLib.File.Create(file);
+                        TagLib.File tagFile = TagLib.File.Create(file);
 
                         return new Music
                         {
@@ -33,7 +33,8 @@ namespace BItRuisseau.Services
                                         ? Path.GetFileNameWithoutExtension(file)
                                         : tagFile.Tag.Title,
                             Author = tagFile.Tag.Performers ?? Array.Empty<string>(),
-                            Duration = tagFile.Properties.Duration
+                            Duration = tagFile.Properties.Duration,
+                            Year = tagFile.Tag.Year
                         };
                     }
                     catch

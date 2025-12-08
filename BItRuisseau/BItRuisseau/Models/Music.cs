@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BItRuisseau.Models
+﻿namespace BItRuisseau.Models
 {
     public class Music
     {
@@ -12,6 +6,7 @@ namespace BItRuisseau.Models
         public string Title { get; set; } = string.Empty;
         public string[] Author { get; set; } = Array.Empty<string>();
         public TimeSpan Duration { get; set; } = TimeSpan.Zero;
-        public string FilePath { get; set; }
+        public string? FilePath { get; set; }
+        public uint Year { get; set; } = 0;
     }
 }
