@@ -1,137 +1,80 @@
 ﻿@page "/"
 @inject SettingsService SettingsService
 @inject MusicService MusicService
+@inject PlayerService Player
 
 <div class="content-page">
-    @if (string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
-    {
-        <p>Aucun dossier configuré. Veuillez en choisir un…</p>
-        <button @onclick="SelectFolder">Choisir un dossier</button>
-    }
-    else
-    {
-        <div class="music-player">
-            <aside class="music-list">
-                <ul>
-                    @foreach (var song in songs)
-                    {
-                        <li @onclick="() => PlaySong(song)" style="cursor:pointer;@(currentSong == song ? "font-weight:bold;" : "")">
-                            @song.Title
-                        </li>
-                    }
-                </ul>
-            </aside>
+	@if (string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
+	{
+		<p>No folder selected.</p>
+		<button @onclick="SelectFolder">Choose Folder</button>
+	}
+	else
+	{
+		<div class="music-player">
+			<aside class="music-list-grid">
+				@foreach (var song in songs)
+				{
+					<div class="song-box @(Player.CurrentSong == song ? "active" : "")"
+						 @onclick="() => SelectSong(song)">
 
-            <div class="player">
-                @if (currentSong != null)
-                {
-                    <p>Lecture en cours : @(string.IsNullOrEmpty(currentSong.Title) ? Path.GetFileName(currentSong.FilePath) : currentSong.Title)</p>
-                    <p>
-                        Status:
-                        @if (IsPlaying)
-                        {
-                            <span>🎵 Playing</span>
-                        }
-                        else if (IsPaused)
-                        {
-                            <span>⏸ Paused</span>
-                        }
-                        else
-                        {
-                            <span>■ Stopped</span>
-                        }
-                    </p>
+						<div class="song-image-placeholder">
+						</div>
 
-                    <button @onclick="() => PlaySong(currentSong)" disabled="@IsPlaying">Play</button>
-                    <button @onclick="PauseSong" disabled="@(!IsPlaying)">Pause</button>
-                    <button @onclick="StopSong" disabled="@IsStopped">Stop</button>
-                }
-                else
-                {
-                    <p>Sélectionnez une musique pour jouer</p>
-                }
-            </div>
-        </div>
-    }
+						<p class="songTitle">@song.Title.Shorten(20)</p>
+						<p class="artistName">@string.Join(", ", song.Author).Shorten(15)</p>
+
+					</div>
+				}
+			</aside>
+
+
+		</div>
+	}
 </div>
 
 @code {
-    private List<Music> songs = new();
-    private Music currentSong;
+	private List<Music> songs = new();
 
-    private NAudio.Wave.IWavePlayer waveOut;
-    private NAudio.Wave.AudioFileReader audioFile;
+	protected override void OnInitialized()
+	{
+		LoadSongs();
+		Player.SetPlaylist(songs);
 
-    private bool IsPlaying => waveOut?.PlaybackState == NAudio.Wave.PlaybackState.Playing;
-    private bool IsPaused => waveOut?.PlaybackState == NAudio.Wave.PlaybackState.Paused;
-    private bool IsStopped => waveOut?.PlaybackState == NAudio.Wave.PlaybackState.Stopped || waveOut == null;
+		Player.OnSongChanged += OnSongChanged;
+	}
 
-    protected override void OnInitialized()
-    {
-        LoadSongs();
-    }
+	private void OnSongChanged()
+	{
+		InvokeAsync(StateHasChanged);
+	}
 
-    private async Task SelectFolder()
-    {
-        bool picked = await SettingsService.PickMusicFolderAsync();
-        if (picked)
-        {
-            LoadSongs();
-            StateHasChanged();
-        }
-    }
+	private async Task SelectFolder()
+	{
+		bool picked = await SettingsService.PickMusicFolderAsync();
+		if (picked)
+		{
+			LoadSongs();
+			Player.SetPlaylist(songs);
+			StateHasChanged();
+		}
+	}
 
-    private void LoadSongs()
-    {
-        if (!string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
-        {
-            songs = MusicService.GetMusics(SettingsService.Current.MusicFolderPath);
-        }
-    }
+	private void LoadSongs()
+	{
+		if (!string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
+		{
+			songs = MusicService.GetMusics(SettingsService.Current.MusicFolderPath);
+		}
+	}
 
-    private void PlaySong(Music song)
-    {
-        try
-        {
-            if (IsPlaying && currentSong == song)
-                return;
+	private void SelectSong(Music song)
+	{
+		Player.Play(song);
+	}
 
-            StopSong();
-
-            currentSong = song;
-            audioFile = new NAudio.Wave.AudioFileReader(song.FilePath);
-            waveOut = new NAudio.Wave.WaveOutEvent();
-            waveOut.Init(audioFile);
-            waveOut.Play();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error playing {song.FilePath}: {ex.Message}");
-        }
-    }
-
-    private void PauseSong()
-    {
-        if (IsPlaying)
-        {
-            waveOut.Pause();
-        }
-    }
-
-    private void StopSong()
-    {
-        if (waveOut != null)
-        {
-            waveOut.Stop();
-            audioFile?.Dispose();
-            waveOut.Dispose();
-            audioFile = null;
-            waveOut = null;
-        }
-    }
-
-    public void Dispose()
-    {
-        StopSong();
-    }
+	public void Dispose()
+	{
+		Player.OnSongChanged -= OnSongChanged;
+	}
 }
