@@ -21,6 +21,8 @@ namespace BItRuisseau
             builder.Services.AddSingleton<IFolderPicker>(FolderPicker.Default);
             builder.Services.AddSingleton<SettingsService>();
             builder.Services.AddSingleton<MusicService>();
+            builder.Services.AddSingleton<PlayerService>();
+            builder.Services.AddLucideIcons();
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
