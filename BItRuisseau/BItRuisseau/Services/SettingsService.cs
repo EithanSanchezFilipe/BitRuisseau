@@ -1,8 +1,8 @@
 ﻿using System.Text.Json;
 using CommunityToolkit.Maui.Storage;
-using BItRuisseau.Models;
+using BitRuisseau.Models;
 
-namespace BItRuisseau.Services;
+namespace BitRuisseau.Services;
 
 public class SettingsService
 {

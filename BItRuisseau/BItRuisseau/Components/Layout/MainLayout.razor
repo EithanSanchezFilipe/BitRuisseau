@@ -1,6 +1,8 @@
 ﻿@inherits LayoutComponentBase
 @inject PlayerService Player
 @inject NavigationManager Navigation
+@inject AgentService AgentService
+@inject MusicService MusicService
 @using InfiniLore.Lucide
 
 <div class="app-container">
@@ -12,9 +14,11 @@
     <div class="page-container">
         <aside class="sidebar">
             <ul>
-                <li>Eithan</li>
-                <li>Mathis</li>
-                <li>Emma</li>
+                <li @onclick="() => MusicService.SetCurrentList(MusicService.MyMusicList)">Moi</li>
+                @foreach (MediaCenter node in AgentService.Nodes)
+                {
+                    <li @onclick="() => OnUserClicked(node)">@node.Name</li>
+                }
             </ul>
         </aside>
 
@@ -35,8 +39,8 @@
                 </div>
                 <div class="song-info">
                     <div class="song-title">@Player.CurrentSong.Title.Shorten(50)</div>
-                    <div class="song-artist">@string.Join(", ",Player.CurrentSong.Author)</div>
-                    <div class="song-meta">@Player.CurrentSong.Year |  @Player.CurrentSong.Duration.ToString(@"mm\:ss")</div>
+                    <div class="song-artist">@string.Join(", ",Player.CurrentSong.Artist)</div>
+                    <div class="song-meta">@Player.CurrentSong.Year |  @Player.Elapsed.ToString(@"mm\:ss") : @Player.CurrentSong.Duration.ToString(@"mm\:ss")</div>
                 </div>
             </div>
 
@@ -72,17 +76,39 @@
 </div>
 
 @code {
+    private MediaCenter mediaCenter = new MediaCenter("Eithan");
+
+
     private void GoToSettings()
     {
         Navigation.NavigateTo("/settings");
     }
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        Player.OnSongChanged += StateHasChanged;
+        Player.OnSongChanged += Refresh;
+        Player.OnTimeUpdated += Refresh;
+        AgentService.OnNodesUpdated += Refresh;
+        await AgentService.StartAsync(mediaCenter);
+
+    }
+
+    private void Refresh()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnUserClicked(MediaCenter user)
+    {
+        // send catalog request
+        await AgentService.SendEnvelopeAsync(new Envelope(mediaCenter.Id, user.Id, MessageType.CATALOG_REQUEST, ""), "/users");
     }
 
     public void Dispose()
     {
-        Player.OnSongChanged -= StateHasChanged;
+        Player.OnSongChanged -= Refresh;
+        Player.OnTimeUpdated -= Refresh;
+        AgentService.OnNodesUpdated -= Refresh;
+
     }
+
 }
