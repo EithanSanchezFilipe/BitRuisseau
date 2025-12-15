@@ -1,64 +1,114 @@
-﻿using BItRuisseau.Models;
+﻿using BitRuisseau.Models;
+using BitRuisseau.Protocol;
 using NAudio.Wave;
+using System.Diagnostics;
+using System.Timers;
 
-namespace BItRuisseau.Services
+namespace BitRuisseau.Services
 {
     public class PlayerService : IDisposable
     {
-        public List<Music> Playlist { get; set; } = new();
-        private Music _currentSong;
-        public Music CurrentSong
+        public List<MediaDescription> Playlist { get; set; } = new();
+
+        private MediaDescription? _currentSong;
+        public MediaDescription? CurrentSong
         {
             get => _currentSong;
             private set
             {
-                _currentSong = value;
-                OnSongChanged?.Invoke();
+                if (_currentSong != value)
+                {
+                    _currentSong = value;
+                    OnSongChanged?.Invoke();
+                }
             }
         }
 
-        private IWavePlayer waveOut;
-        private AudioFileReader audioFile;
+        private IWavePlayer? waveOut;
+        private AudioFileReader? audioFile;
+
+        private readonly System.Timers.Timer _timer;
+
+        public event Action? OnTimeUpdated;
+        public event Action? OnSongChanged;
+
+        public TimeSpan Elapsed =>
+            audioFile?.CurrentTime ?? TimeSpan.Zero;
 
         public bool IsPlaying => waveOut?.PlaybackState == PlaybackState.Playing;
         public bool IsPaused => waveOut?.PlaybackState == PlaybackState.Paused;
-        public bool IsStopped => waveOut?.PlaybackState == PlaybackState.Stopped || waveOut == null;
+        public bool IsStopped => waveOut == null || waveOut.PlaybackState == PlaybackState.Stopped;
 
-        public event Action OnSongChanged;
-
-        public void SetPlaylist(List<Music> playlist) => Playlist = playlist;
-
-        public void Play(Music song)
+        public PlayerService()
         {
-            if (song == null) return;
-            if (IsPlaying && CurrentSong == song) return;
+            _timer = new System.Timers.Timer(500);
+            _timer.Elapsed += (_, _) => OnTimeUpdated?.Invoke();
+        }
+
+        public void SetPlaylist(List<MediaDescription> playlist)
+        {
+            Playlist = playlist ?? new List<MediaDescription>();
+        }
+
+        public void Play(MediaDescription song)
+        {
+            if (song.FilePath == null) return;
+            if (song == null)
+                return;
+
+            if (IsPaused && CurrentSong == song)
+            {
+                waveOut?.Play();
+                _timer.Start();
+                return;
+            }
+
+            if (IsPlaying && CurrentSong == song)
+                return;
 
             Stop();
 
             CurrentSong = song;
             audioFile = new AudioFileReader(song.FilePath);
             waveOut = new WaveOutEvent();
+            
+            waveOut.PlaybackStopped += OnPlaybackStopped;
             waveOut.Init(audioFile);
             waveOut.Play();
+
+            _timer.Start();
         }
 
-        public void Pause() => waveOut?.Pause();
+        public void Pause()
+        {
+            if (!IsPlaying)
+                return;
+
+            waveOut?.Pause();
+            _timer.Stop();
+        }
 
         public void Stop()
         {
+            _timer.Stop();
+
             if (waveOut != null)
             {
+                waveOut.PlaybackStopped -= OnPlaybackStopped;
                 waveOut.Stop();
-                audioFile?.Dispose();
                 waveOut.Dispose();
-                audioFile = null;
                 waveOut = null;
             }
+
+            audioFile?.Dispose();
+            audioFile = null;
         }
 
         public void PlayNext()
         {
-            if (Playlist == null || CurrentSong == null) return;
+            if (CurrentSong == null || Playlist.Count == 0)
+                return;
+
             var index = Playlist.IndexOf(CurrentSong);
             if (index >= 0 && index < Playlist.Count - 1)
                 Play(Playlist[index + 1]);
@@ -66,12 +116,26 @@ namespace BItRuisseau.Services
 
         public void PlayPrevious()
         {
-            if (Playlist == null || CurrentSong == null) return;
+            if (CurrentSong == null || Playlist.Count == 0)
+                return;
+
             var index = Playlist.IndexOf(CurrentSong);
             if (index > 0)
                 Play(Playlist[index - 1]);
         }
 
-        public void Dispose() => Stop();
+        private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
+        {
+            if (audioFile != null && audioFile.Position >= audioFile.Length)
+            {
+                PlayNext();
+            }
+        }
+
+        public void Dispose()
+        {
+            Stop();
+            _timer.Dispose();
+        }
     }
 }
