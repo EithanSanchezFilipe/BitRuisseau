@@ -1,57 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using BItRuisseau.Models;
-using TagLib;
+﻿using BitRuisseau.Protocol;
 
-namespace BItRuisseau.Services
+namespace BitRuisseau.Services
 {
     public class MusicService
     {
-        public List<Music> GetMusics(string folderPath)
+        public List<MediaDescription> MyMusicList { get; set; } = new();
+        public List<MediaDescription> CurrentMusicList { get; set; } = new();
+
+        public event Action? OnMusicListChanged;
+
+        public void SetCurrentList(List<MediaDescription> list)
+        {
+            CurrentMusicList = list;
+            OnMusicListChanged?.Invoke();
+        }
+
+        public void GetMusics(string folderPath)
         {
             if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
-                return new List<Music>();
+            {
+                MyMusicList = new();
+                return;
+            }
 
-            string[] extensions = new[] { ".mp3", ".wav", ".flac", ".m4a" };
+            string[] extensions = { ".mp3", ".wav", ".flac", ".m4a" };
 
-            List<Music> musics = Directory
+            MyMusicList = Directory
                 .GetFiles(folderPath, "*.*", SearchOption.AllDirectories)
                 .Where(f => extensions.Contains(Path.GetExtension(f).ToLower()))
                 .Select(file =>
                 {
                     try
                     {
-                        TagLib.File tagFile = TagLib.File.Create(file);
+                        var tagFile = TagLib.File.Create(file);
 
-                        return new Music
+                        return new MediaDescription
                         {
-                            Name = Path.GetFileName(file),
-                            FilePath = file,
+                            Id = Guid.NewGuid().ToString(),
                             Title = string.IsNullOrWhiteSpace(tagFile.Tag.Title)
-                                        ? Path.GetFileNameWithoutExtension(file)
-                                        : tagFile.Tag.Title,
-                            Author = tagFile.Tag.Performers ?? Array.Empty<string>(),
+                                ? Path.GetFileNameWithoutExtension(file)
+                                : tagFile.Tag.Title,
+                            Artist = tagFile.Tag.Performers?.FirstOrDefault(),
                             Duration = tagFile.Properties.Duration,
-                            Year = tagFile.Tag.Year
+                            Year = (int)tagFile.Tag.Year,
+                            Size = tagFile.Length,
+                            FilePath = file
                         };
                     }
                     catch
                     {
-                        return new Music
+                        return new MediaDescription
                         {
-                            Name = Path.GetFileName(file),
-                            FilePath = file,
+                            Id = Guid.NewGuid().ToString(),
                             Title = Path.GetFileNameWithoutExtension(file),
-                            Author = Array.Empty<string>(),
-                            Duration = TimeSpan.Zero
+                            FilePath = file
                         };
                     }
                 })
                 .ToList();
-
-            return musics;
+            CurrentMusicList = MyMusicList;
         }
     }
 }
