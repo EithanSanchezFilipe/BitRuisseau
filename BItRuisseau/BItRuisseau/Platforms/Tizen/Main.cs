@@ -2,7 +2,7 @@ using System;
 using Microsoft.Maui;
 using Microsoft.Maui.Hosting;
 
-namespace BItRuisseau
+namespace BitRuisseau
 {
     internal class Program : MauiApplication
     {

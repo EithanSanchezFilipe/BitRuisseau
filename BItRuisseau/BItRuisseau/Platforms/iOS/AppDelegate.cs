@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace BItRuisseau
+namespace BitRuisseau
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate

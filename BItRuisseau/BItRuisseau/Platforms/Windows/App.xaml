@@ -1,8 +1,8 @@
 ﻿<maui:MauiWinUIApplication
-    x:Class="BItRuisseau.WinUI.App"
+    x:Class="BitRuisseau.WinUI.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:maui="using:Microsoft.Maui"
-    xmlns:local="using:BItRuisseau.WinUI">
+    xmlns:local="using:BitRuisseau.WinUI">
 
 </maui:MauiWinUIApplication>

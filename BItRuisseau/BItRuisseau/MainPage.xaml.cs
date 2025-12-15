@@ -1,4 +1,4 @@
-﻿namespace BItRuisseau
+﻿namespace BitRuisseau
 {
     public partial class MainPage : ContentPage
     {

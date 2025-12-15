@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace BItRuisseau
+namespace BitRuisseau
 {
     public class Program
     {

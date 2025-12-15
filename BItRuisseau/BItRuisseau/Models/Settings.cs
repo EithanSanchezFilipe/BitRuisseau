@@ -1,4 +1,4 @@
-﻿namespace BItRuisseau.Models;
+﻿namespace BitRuisseau.Models;
 
 public class Settings
 {

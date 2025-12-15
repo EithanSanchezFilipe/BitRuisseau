@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BItRuisseau.Extensions
+namespace BitRuisseau.Extensions
 {
         public static class Extensions
         {
