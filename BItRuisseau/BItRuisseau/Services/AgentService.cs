@@ -114,6 +114,9 @@ namespace BitRuisseau.Services
                     break;
 
                 case MessageType.CATALOG:
+                    if (envelope.ReceiverId != _mediaCenter.Id)
+                        break;
+
                     List<MediaDescription>? descriptions =
                         JsonSerializer.Deserialize<List<MediaDescription>>(envelope.Message);
 
@@ -136,6 +139,8 @@ namespace BitRuisseau.Services
                         await SendEnvelopeAsync(new Envelope(_mediaCenter.Id, envelope.SenderId, MessageType.CATALOG, json), "users");
                     }
                     break;
+
+
             }
         }
     }
