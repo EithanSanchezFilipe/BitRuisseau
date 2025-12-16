@@ -8,7 +8,7 @@ namespace BitRuisseau.Services
     {
         private readonly MqttService _mqtt;
         private readonly MusicService _musicService;
-
+        const int FRAGMENT_SIZE = 32 * 1024;
 
         private List<MediaCenter> _nodes = new();
         public List<MediaCenter> Nodes => _nodes;
@@ -139,7 +139,59 @@ namespace BitRuisseau.Services
                         await SendEnvelopeAsync(new Envelope(_mediaCenter.Id, envelope.SenderId, MessageType.CATALOG, json), "users");
                     }
                     break;
+                case MessageType.FRAGMENT_REQUEST:
+                    if(envelope.ReceiverId != _mediaCenter.Id)
+                        break;
+                    Fragment request = JsonSerializer.Deserialize<Fragment>(envelope.Message)!;
 
+
+                    MediaDescription? media = _musicService.MyMusicList
+                        .FirstOrDefault(m => m.Id == request.MediaId);
+
+                    if (media?.FilePath == null)
+                        break;
+
+                    //checks if the start index is lower than 0 if that the case we start at the beginning of the file
+                    long start = request.StartIndex < 0 ? 0 : request.StartIndex;
+
+                    //checks the last byte of the file but if the fragment wanted is bigger than the song it takes the last song byte as end index
+                    long end = Math.Min(start + FRAGMENT_SIZE - 1, media.Size - 1);
+
+                    //computes the number of bytes needed to 1 fragment
+                    int length = (int)(end - start + 1);
+
+                    byte[] buffer = new byte[length];
+                    using (var fs = new FileStream(media.FilePath, FileMode.Open, FileAccess.Read))
+                    {
+                        //puts the read index to the start index
+                        fs.Seek(start, SeekOrigin.Begin);
+                        int read = fs.Read(buffer, 0, length);
+                        if (read != length)
+                        {
+                            Array.Resize(ref buffer, read); //resizes the array to not send inutile bytes
+                            end = start + read - 1;
+                        }
+                    }
+
+                    Fragment fragment = new Fragment
+                    {
+                        MediaId = media.Id,
+                        StartIndex = request.StartIndex,
+                        EndIndex = request.EndIndex,
+                        Content = Convert.ToBase64String(buffer)
+                    };
+
+                    await SendEnvelopeAsync(
+                        new Envelope(
+                            _mediaCenter.Id,
+                            envelope.SenderId,
+                            MessageType.FRAGMENT,
+                            JsonSerializer.Serialize(fragment)
+                        ),
+                        $"/media/{media.Id}"
+                    );
+
+                    break;
 
             }
         }
