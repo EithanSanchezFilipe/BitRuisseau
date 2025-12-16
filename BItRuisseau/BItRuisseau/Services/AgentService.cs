@@ -67,7 +67,7 @@ namespace BitRuisseau.Services
                 JsonSerializer.Serialize(_mediaCenter)
             );
 
-            await SendEnvelopeAsync(hello, "users");
+            await SendEnvelopeAsync(hello, "/users");
         }
 
         private async Task HandleEnvelope(Envelope envelope)
@@ -109,7 +109,7 @@ namespace BitRuisseau.Services
                             MessageType.I_AM_HERE,
                             JsonSerializer.Serialize(_mediaCenter)
                         ),
-                        "users"
+                        "/users"
                     );
                     break;
 
@@ -136,7 +136,7 @@ namespace BitRuisseau.Services
                         // send back my music
                         string json = JsonSerializer.Serialize(_musicService.MyMusicList);
 
-                        await SendEnvelopeAsync(new Envelope(_mediaCenter.Id, envelope.SenderId, MessageType.CATALOG, json), "users");
+                        await SendEnvelopeAsync(new Envelope(_mediaCenter.Id, envelope.SenderId, MessageType.CATALOG, json), $"/center/{_mediaCenter.Id}");
                     }
                     break;
                 case MessageType.FRAGMENT_REQUEST:
