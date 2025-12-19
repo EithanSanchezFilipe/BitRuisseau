@@ -3,6 +3,7 @@
 @inject NavigationManager Navigation
 @inject AgentService AgentService
 @inject MusicService MusicService
+@implements IDisposable
 @using InfiniLore.Lucide
 
 <div class="app-container">
@@ -15,10 +16,11 @@
         <aside class="sidebar">
             <ul>
                 <li @onclick="() => MusicService.SetCurrentList(MusicService.MyMusicList)">Moi</li>
-                @foreach (MediaCenter node in AgentService.Nodes)
+                @foreach (MediaCenter node in AgentService.Nodes.ToList())
                 {
                     <li @onclick="() => OnUserClicked(node)">@node.Name</li>
                 }
+
             </ul>
         </aside>
 
@@ -78,7 +80,6 @@
 @code {
     private MediaCenter mediaCenter = new MediaCenter("Eithan");
 
-
     private void GoToSettings()
     {
         Navigation.NavigateTo("/settings");
@@ -100,7 +101,7 @@
     private async Task OnUserClicked(MediaCenter user)
     {
         // send catalog request
-        await AgentService.SendEnvelopeAsync(new Envelope(mediaCenter.Id, user.Id, MessageType.CATALOG_REQUEST, ""), "/users");
+        await AgentService.SendEnvelopeAsync(new Envelope(mediaCenter.Id, user.Id, MessageType.CATALOG_REQUEST, ""), "users");
     }
 
     public void Dispose()
@@ -108,7 +109,7 @@
         Player.OnSongChanged -= Refresh;
         Player.OnTimeUpdated -= Refresh;
         AgentService.OnNodesUpdated -= Refresh;
-
+        _ = AgentService.StopAsync();
     }
 
 }

@@ -45,7 +45,7 @@ namespace BitRuisseau.Services
 
         public async Task StopAsync()
         {
-            var goodbye = new Envelope(_mediaCenter.Id, null, MessageType.I_AM_OUT, "");
+            var goodbye = new Envelope(_mediaCenter.Id, null, MessageType.I_AM_OUT, JsonSerializer.Serialize(_mediaCenter));
             await SendEnvelopeAsync(goodbye, "users");
             await _mqtt.DisconnectAsync();
         }
@@ -67,7 +67,7 @@ namespace BitRuisseau.Services
                 JsonSerializer.Serialize(_mediaCenter)
             );
 
-            await SendEnvelopeAsync(hello, "/users");
+            await SendEnvelopeAsync(hello, "users");
         }
 
         private async Task HandleEnvelope(Envelope envelope)
@@ -105,38 +105,42 @@ namespace BitRuisseau.Services
                     await SendEnvelopeAsync(
                         new Envelope(
                             _mediaCenter.Id,
-                            null,
+                            sender.Id,
                             MessageType.I_AM_HERE,
                             JsonSerializer.Serialize(_mediaCenter)
                         ),
-                        "/users"
+                        "users"
                     );
+                    break;
+                case MessageType.I_AM_OUT:
+                    _nodes.Remove(_nodes.Where(node => node.Id == envelope.SenderId).FirstOrDefault());
+                    OnNodesUpdated?.Invoke();
                     break;
 
                 case MessageType.CATALOG:
                     if (envelope.ReceiverId != _mediaCenter.Id)
                         break;
+                    
+                    Catalog? catalog =
+                        JsonSerializer.Deserialize<Catalog>(envelope.Message);
 
-                    List<MediaDescription>? descriptions =
-                        JsonSerializer.Deserialize<List<MediaDescription>>(envelope.Message);
-
-                    if (descriptions == null)
+                    if (catalog == null)
                         break;
 
-                    var musics = descriptions;
+                    var musics = catalog.Medias;
 
                     _musicService.CurrentMusicList = musics;
                     OnMediaListReceived?.Invoke();
                     break;
 
                 case MessageType.CATALOG_REQUEST:
-                    // am i the receiver ?
                     if (envelope.ReceiverId == _mediaCenter.Id)
                     {
+                        Catalog medias = new Catalog() { MediaCenterId = _mediaCenter.Id, Medias= _musicService.MyMusicList };
                         // send back my music
-                        string json = JsonSerializer.Serialize(_musicService.MyMusicList);
+                        string json = JsonSerializer.Serialize<Catalog>(medias);
 
-                        await SendEnvelopeAsync(new Envelope(_mediaCenter.Id, envelope.SenderId, MessageType.CATALOG, json), $"/center/{_mediaCenter.Id}");
+                        await SendEnvelopeAsync(new Envelope(_mediaCenter.Id, envelope.SenderId, MessageType.CATALOG, json), $"user/{_mediaCenter.Id}");
                     }
                     break;
                 case MessageType.FRAGMENT_REQUEST:
@@ -188,7 +192,7 @@ namespace BitRuisseau.Services
                             MessageType.FRAGMENT,
                             JsonSerializer.Serialize(fragment)
                         ),
-                        $"/media/{media.Id}"
+                        $"media/{media.Id}"
                     );
 
                     break;
