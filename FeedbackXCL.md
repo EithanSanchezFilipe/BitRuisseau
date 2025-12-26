@@ -8,3 +8,16 @@
 - Implémentation: Il y a un début, mais il est maigre
 
 - Global: Mauvais départ, sur la base de ce que vous me donnez à voir. Corrigez le tir sans plus attendre SVP.
+
+## 80%
+
+- Réalisation du player standalone:
+- Réalisation du player connecté:
+- Qualité du code:
+- Maîtrise technique:
+- Autonomie:
+- Livraison: pas de journal de travail attaché à la release
+- Journal de travail:
+- .gitignore:
+
+- En résumé:
