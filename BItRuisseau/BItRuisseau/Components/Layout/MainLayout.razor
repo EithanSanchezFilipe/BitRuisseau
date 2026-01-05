@@ -101,7 +101,7 @@
     private async Task OnUserClicked(MediaCenter user)
     {
         // send catalog request
-        await AgentService.SendEnvelopeAsync(new Envelope(mediaCenter.Id, user.Id, MessageType.CATALOG_REQUEST, ""), "users");
+        await AgentService.SendEnvelopeAsync(new Envelope(mediaCenter.Id, user.Id, MessageType.CATALOG_REQUEST, ""), AgentService.BASE_TOPIC);
     }
 
     public void Dispose()
