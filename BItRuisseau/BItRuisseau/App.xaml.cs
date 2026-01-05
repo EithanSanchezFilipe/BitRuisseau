@@ -28,7 +28,7 @@ namespace BitRuisseau
         {
             try
             {
-                var agent = _services.GetService<AgentService>();
+                AgentService agent = _services.GetService<AgentService>();
                 if (agent != null)
                 {
                     await agent.StopAsync();
