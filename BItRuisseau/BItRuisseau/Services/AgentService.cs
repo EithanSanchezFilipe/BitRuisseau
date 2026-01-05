@@ -6,6 +6,7 @@ namespace BitRuisseau.Services
 {
     public class AgentService
     {
+        public const string BASE_TOPIC = "powercher/bitruisseau";
         private readonly MqttService _mqtt;
         private readonly MusicService _musicService;
         const int FRAGMENT_SIZE = 32 * 1024;
@@ -27,11 +28,17 @@ namespace BitRuisseau.Services
 
             _mqtt.MessageReceived += (topic, payload) =>
             {
-                Envelope? envelope = Envelope.FromJson(payload);
-                if (envelope != null)
+                try {
+                    Envelope? envelope = Envelope.FromJson(payload);
+                    if (envelope != null)
+                    {
+                        HandleEnvelope(envelope);
+                        OnEnvelopeReceived?.Invoke(envelope);
+                    }
+                
+                }
+                catch (Exception ex)
                 {
-                    HandleEnvelope(envelope);
-                    OnEnvelopeReceived?.Invoke(envelope);
                 }
             };
         }
@@ -46,7 +53,7 @@ namespace BitRuisseau.Services
         public async Task StopAsync()
         {
             var goodbye = new Envelope(_mediaCenter.Id, null, MessageType.I_AM_OUT, JsonSerializer.Serialize(_mediaCenter));
-            await SendEnvelopeAsync(goodbye, "users");
+            await SendEnvelopeAsync(goodbye, BASE_TOPIC);
             await _mqtt.DisconnectAsync();
         }
 
@@ -67,7 +74,7 @@ namespace BitRuisseau.Services
                 JsonSerializer.Serialize(_mediaCenter)
             );
 
-            await SendEnvelopeAsync(hello, "users");
+            await SendEnvelopeAsync(hello, BASE_TOPIC);
         }
 
         private async Task HandleEnvelope(Envelope envelope)
@@ -78,22 +85,20 @@ namespace BitRuisseau.Services
             switch (envelope.Type)
             {
                 case MessageType.I_AM_HERE:
-                    try
                     {
-                        MediaCenter? mediaCenter =
-                            JsonSerializer.Deserialize<MediaCenter>(envelope.Message);
 
-                        if (mediaCenter != null && !_nodes.Any(n => n.Name == mediaCenter.Name))
+                        MediaCenter mediaCenter =
+                            JsonSerializer.Deserialize<MediaCenter>(envelope.Message)!;
+
+                        //n'est pas idempotant avec tout le monde aucune idée pourquoi
+                        if (!_nodes.Any(n => n.Id == mediaCenter.Id))
                         {
                             _nodes.Add(mediaCenter);
                             OnNodesUpdated?.Invoke();
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to parse envelope payload: {ex.Message}");
-                    }
                     break;
+
 
                 case MessageType.WHO_IS_THERE:
                     MediaCenter sender =
@@ -109,7 +114,7 @@ namespace BitRuisseau.Services
                             MessageType.I_AM_HERE,
                             JsonSerializer.Serialize(_mediaCenter)
                         ),
-                        "users"
+                        BASE_TOPIC
                     );
                     break;
                 case MessageType.I_AM_OUT:
@@ -140,7 +145,7 @@ namespace BitRuisseau.Services
                         // send back my music
                         string json = JsonSerializer.Serialize<Catalog>(medias);
 
-                        await SendEnvelopeAsync(new Envelope(_mediaCenter.Id, envelope.SenderId, MessageType.CATALOG, json), $"user/{_mediaCenter.Id}");
+                        await SendEnvelopeAsync(new Envelope(_mediaCenter.Id, envelope.SenderId, MessageType.CATALOG, json), $"{BASE_TOPIC}");
                     }
                     break;
                 case MessageType.FRAGMENT_REQUEST:
@@ -192,7 +197,7 @@ namespace BitRuisseau.Services
                             MessageType.FRAGMENT,
                             JsonSerializer.Serialize(fragment)
                         ),
-                        $"media/{media.Id}"
+                        $"{BASE_TOPIC}/{media.Id}"
                     );
 
                     break;
