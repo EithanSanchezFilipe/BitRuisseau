@@ -1,0 +1,229 @@
+{
+  "repoUrl": "https://github.com/EithanSanchezFilipe/BitRuisseau",
+  "projectName": "MediaPlayer",
+  "branch": "main",
+  "me": "EithanSanchezFilipe",
+  "journalStartDate": null,
+  "exceptions": [
+    {
+      "id": "b9a74695-b91f-4d4c-9109-c54d39af7ae6",
+      "type": "commitless",
+      "name": "Kickoff",
+      "description": "",
+      "date": "2025-11-03T07:00:00.000Z",
+      "duration": 50,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "35d2e3f6-a6ea-485b-8674-758abcac7d3d",
+      "type": "commitless",
+      "name": "doc(user stories): analyze and create user stories",
+      "description": "analyze and create user stories (Définir le dossier des fichier audios, afficher la liste des fichiers audio, afficher les métadonnées des fichiers audio, lancer la lecture d'un fichier)",
+      "date": "2025-11-03T08:00:00.000Z",
+      "duration": 60,
+      "status": "WIP",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "fd54db89-c558-4f7b-9db9-5e030cf44088",
+      "type": "commitless",
+      "name": "Mise à jour de Visual Studio",
+      "description": "",
+      "date": "2025-11-17T07:13:00.000Z",
+      "duration": 10,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "0710df8f-861d-436c-86dd-e8464d13e807",
+      "type": "commitless",
+      "name": "Améliorer le visuel (pas retenu)",
+      "description": "Améliorer le visuel pour rendre l'application plus belle",
+      "date": "2025-11-24T08:10",
+      "duration": 80,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "e7e0c7c6-8698-46ab-ac62-7cace476b48b",
+      "type": "commitless",
+      "name": "refactor(settings): add a settings service for all the actions so it simplier to implement the settings page",
+      "description": "",
+      "date": "2025-12-01T08:00",
+      "duration": 40,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "949a2725-ba96-4423-b641-8bbe33b902a5",
+      "type": "commitless",
+      "name": "feat(settings): add the settings page and restyle the app",
+      "description": "",
+      "date": "2025-12-01T09:11:00.000Z",
+      "duration": 45,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "d91555b2-8482-4955-a09e-60622381d524",
+      "type": "commitless",
+      "name": "feat(music): add year metadata to Music model",
+      "description": "",
+      "date": "2025-12-08T07:00:00.000Z",
+      "duration": 15,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "33463c16-c194-4b80-9081-9706430e95b9",
+      "type": "commitless",
+      "name": "feat(extension): add string utility extension",
+      "description": "",
+      "date": "2025-12-08T07:15:00.000Z",
+      "duration": 10,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "5b4fa855-07e4-4a0d-96f8-26930dc18098",
+      "type": "commitless",
+      "name": "feat(player): implement PlayerService for centralized playback",
+      "description": "",
+      "date": "2025-12-08T08:25:00.000Z",
+      "duration": 40,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "2e56c494-5c2d-4835-a2e5-a37d1deb670e",
+      "type": "commitless",
+      "name": "build(deps): add Lucide icons package",
+      "description": "",
+      "date": "2025-12-08T08:05:00.000Z",
+      "duration": 5,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "0cf2fa3e-5d7c-431b-911d-ed8537930fd5",
+      "type": "commitless",
+      "name": "feat(di): register PlayerService and Lucide icons",
+      "description": "",
+      "date": "2025-12-08T08:10:00.000Z",
+      "duration": 10,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "a296561e-7c8b-4fa3-834c-b6b2d149e97b",
+      "type": "commitless",
+      "name": "refactor(home): migrate to PlayerService architecture",
+      "description": "",
+      "date": "2025-12-08T08:20:00.000Z",
+      "duration": 25,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "c8309f92-61c5-4ff2-9877-3d110c7566ac",
+      "type": "commitless",
+      "name": "feat(ui): implement bottom player bar and grid layout",
+      "description": "",
+      "date": "2025-12-08T08:45:00.000Z",
+      "duration": 30,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "1bfb0075-90fc-460d-82f5-316a7cf6e803",
+      "type": "commitless",
+      "name": "chore(app): rename app namespace to BitRuisseau",
+      "description": "",
+      "date": "2025-12-15T08:00",
+      "duration": 20,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "98d969af-a183-4e10-b9e2-be79dc9ed096",
+      "type": "commitless",
+      "name": "feat(MQTT): add protocol models for MQTT communication",
+      "description": "",
+      "date": "2025-12-15T08:20",
+      "duration": 20,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "21e4e89f-0470-45d3-bca2-1e66e0ed9bb7",
+      "type": "commitless",
+      "name": "feat(MQTT): add MQTT service for network communication",
+      "description": "",
+      "date": "2025-12-15T08:40",
+      "duration": 30,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "f45f59c3-9866-4d26-9b78-f9aa02949239",
+      "type": "commitless",
+      "name": "feat: add agent service for media center communication",
+      "description": "Implemented comprehensive agent service for managing MQTT-based media center communication including node discovery, catalog exchange, and message routing. Required careful handling of multiple message types, state management for discovered nodes, and proper envelope serialization/deserialization.",
+      "date": "2025-12-15T08:10:00.000Z",
+      "duration": 50,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "54c33ef2-6a30-45f8-a25a-057a19a481d9",
+      "type": "commitless",
+      "name": "refactor: migrate from Music model to MediaDescription protocol",
+      "description": "",
+      "date": "2025-12-15T09:00:00.000Z",
+      "duration": 25,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "5fdaa509-cbcc-4045-9d11-8d2b995f93fe",
+      "type": "commitless",
+      "name": "feat: enhance player service with timer and auto-play features",
+      "description": "",
+      "date": "2025-12-15T09:25:00.000Z",
+      "duration": 35,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "de4156be-e19f-4aa9-a8d7-a81d9829f09d",
+      "type": "commitless",
+      "name": "feat: integrate MQTT services and update UI components",
+      "description": "",
+      "date": "2025-12-15T10:00:00.000Z",
+      "duration": 30,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "bb7e96e6-5423-4b05-8dcc-a4aef82c6027",
+      "type": "commitless",
+      "name": "style: update song box styling",
+      "description": "",
+      "date": "2025-12-15T10:30:00.000Z",
+      "duration": 8,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    },
+    {
+      "id": "e35d92a9-cc96-423b-adc9-1d12e897c2d3",
+      "type": "commitless",
+      "name": "feat: implement disconnect message",
+      "description": "",
+      "date": "2025-12-19T20:14:00.000Z",
+      "duration": 10,
+      "status": "Done",
+      "author": "EithanSanchezFilipe"
+    }
+  ]
+}
