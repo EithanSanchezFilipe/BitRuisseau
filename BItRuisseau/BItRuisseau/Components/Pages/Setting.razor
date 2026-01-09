@@ -3,19 +3,25 @@
 @inject NavigationManager Navigation
 
 <div class="settings-page">
-    <h1>Paramètres</h1>
-    <p>Dossier actuel : @(SettingsService.Current.MusicFolderPath ?? "Non configuré")</p>
-    <button @onclick="ChangeFolder">Changer le dossier</button>
-    <button @onclick="GoHome">Retour à l'accueil</button>
+    <h1>Settings</h1>
+    <p>Current folder: @(SettingsService.Current.MusicFolderPath ?? "Not configured")</p>
+    <button @onclick="ChangeFolder">Change Folder</button>
+    <button @onclick="GoHome">Back to Home</button>
 </div>
 
 @code {
+    /// <summary>
+    /// Opens a folder picker to select a new music folder.
+    /// </summary>
     private async Task ChangeFolder()
     {
         await SettingsService.PickMusicFolderAsync();
-        StateHasChanged();
+        StateHasChanged(); // Refresh the UI after folder selection
     }
 
+    /// <summary>
+    /// Navigates back to the home page.
+    /// </summary>
     private void GoHome()
     {
         Navigation.NavigateTo("/");

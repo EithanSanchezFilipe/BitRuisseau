@@ -1,11 +1,10 @@
-﻿using BitRuisseau.Protocol;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-namespace BitRuisseau.Models
+namespace BitRuisseau.Models.Protocol
 {
     public class Envelope(string senderId, string receiverId, MessageType type, string? message)
     {

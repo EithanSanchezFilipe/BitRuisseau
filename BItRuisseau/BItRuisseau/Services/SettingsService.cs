@@ -4,44 +4,64 @@ using BitRuisseau.Models;
 
 namespace BitRuisseau.Services;
 
+/// <summary>
+/// Service responsible for loading, saving and updating application settings.
+/// </summary>
 public class SettingsService
 {
     private readonly IFolderPicker _folderPicker;
-
     public Settings Current { get; private set; } = new();
 
-    private readonly string SETTINGS_FILE =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-        "BitRuisseau", "AppSettings.json");
+    private const string SETTINGS_FILE =
+        "BitRuisseau/AppSettings.json";
 
+    /// <summary>
+    /// Initializes a new instance of the SettingsService.
+    /// </summary>
+    /// <param name="folderPicker">Folder picker service</param>
     public SettingsService(IFolderPicker folderPicker)
     {
         _folderPicker = folderPicker;
         Load();
     }
 
+    /// <summary>
+    /// Loads settings from the local configuration file.
+    /// </summary>
     public void Load()
     {
         try
         {
-            if (File.Exists(SETTINGS_FILE))
+            var filePath = GetSettingsFilePath();
+
+            if (File.Exists(filePath))
             {
-                string json = File.ReadAllText(SETTINGS_FILE);
+                string json = File.ReadAllText(filePath);
                 Current = JsonSerializer.Deserialize<Settings>(json) ?? new Settings();
             }
         }
         catch
         {
+            // If loading fails, default settings are used
             Current = new Settings();
         }
     }
 
+    /// <summary>
+    /// Saves current settings to the local configuration file.
+    /// </summary>
     public void Save()
     {
-        Directory.CreateDirectory(Path.GetDirectoryName(SETTINGS_FILE)!);
-        File.WriteAllText(SETTINGS_FILE, JsonSerializer.Serialize(Current));
+        var filePath = GetSettingsFilePath();
+
+        Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+        File.WriteAllText(filePath, JsonSerializer.Serialize(Current));
     }
 
+    /// <summary>
+    /// Opens a folder picker to select the music directory.
+    /// </summary>
+    /// <returns>True if a folder was selected successfully</returns>
     public async Task<bool> PickMusicFolderAsync()
     {
         try
@@ -59,5 +79,12 @@ public class SettingsService
         {
             return false;
         }
+    }
+
+    private static string GetSettingsFilePath()
+    {
+        return Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            SETTINGS_FILE);
     }
 }

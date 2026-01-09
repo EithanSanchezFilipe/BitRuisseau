@@ -1,4 +1,4 @@
-﻿namespace BitRuisseau.Protocol
+﻿namespace BitRuisseau.Models.Protocol
 {
     /// <summary>
     /// Un objet de ce type décrit une médiathèque,

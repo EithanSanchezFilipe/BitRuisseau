@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace BitRuisseau.Protocol
+namespace BitRuisseau.Models.Protocol
 {
     /// <summary>
     /// Un objet de ce type décrit un média audio,

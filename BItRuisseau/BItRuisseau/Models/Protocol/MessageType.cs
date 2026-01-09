@@ -1,4 +1,4 @@
-﻿namespace BitRuisseau.Protocol
+﻿namespace BitRuisseau.Models.Protocol
 {
     public enum MessageType
     {

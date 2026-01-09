@@ -1,6 +1,13 @@
-﻿namespace BitRuisseau.Models;
-
-public class Settings
+﻿namespace BitRuisseau.Models
 {
-    public string MusicFolderPath { get; set; } = string.Empty;
+    /// <summary>
+    /// Represents application settings.
+    /// </summary>
+    public class Settings
+    {
+        /// <summary>
+        /// Gets or sets the path to the music folder.
+        /// </summary>
+        public string MusicFolderPath { get; set; } = string.Empty;
+    }
 }

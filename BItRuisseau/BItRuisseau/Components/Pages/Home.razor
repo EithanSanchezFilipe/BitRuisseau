@@ -6,8 +6,8 @@
 <div class="content-page">
     @if (string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
     {
-        <p>No folder selected.</p>
-        <button @onclick="SelectFolder">Choose Folder</button>
+        <p>Aucun dossier sélectionné.</p>
+        <button @onclick="SelectFolder">Choisir un dossier</button>
     }
     else
     {
@@ -30,9 +30,15 @@
 @code {
     private Action? _playerChangedHandler;
 
+    /// <summary>
+    /// Initializes the page and subscribes to ViewModel events.
+    /// Loads songs if a music folder is already configured.
+    /// </summary>
     protected override void OnInitialized()
     {
         _playerChangedHandler = () => InvokeAsync(StateHasChanged);
+
+        // Subscribe to music list changes and player state changes
         ViewModel.CurrentMusicList.CollectionChanged += (_, __) => InvokeAsync(StateHasChanged);
         ViewModel.OnPlayerChanged += _playerChangedHandler;
 
@@ -42,6 +48,10 @@
         }
     }
 
+    /// <summary>
+    /// Opens a folder picker for the user to select a music folder.
+    /// Loads the songs if a folder was successfully chosen.
+    /// </summary>
     private async Task SelectFolder()
     {
         bool picked = await SettingsService.PickMusicFolderAsync();
@@ -52,9 +62,16 @@
         }
     }
 
+    /// <summary>
+    /// Unsubscribes from events and disposes the ViewModel.
+    /// </summary>
     public void Dispose()
     {
-        ViewModel.OnPlayerChanged -= _playerChangedHandler;
+        if (_playerChangedHandler != null)
+        {
+            ViewModel.OnPlayerChanged -= _playerChangedHandler;
+        }
+
         ViewModel.Dispose();
     }
 }

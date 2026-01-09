@@ -1,14 +1,24 @@
-﻿using BitRuisseau.Protocol;
+﻿using BitRuisseau.Models.Protocol;
 
-namespace BitRuisseau.Services
+namespace BitRuisseau.Services;
+
+/// <summary>
+/// Provides access to the local media center instance.
+/// </summary>
+public class LocalMediaCenterService
 {
-    public class LocalMediaCenterService
-    {
-        public MediaCenter Instance { get; }
+    private const string DEFAULT_MEDIA_CENTER_NAME = "Eithan";
 
-        public LocalMediaCenterService()
-        {
-            Instance = new MediaCenter("Eithan");
-        }
+    /// <summary>
+    /// Local media center instance.
+    /// </summary>
+    public MediaCenter Instance { get; }
+
+    /// <summary>
+    /// Initializes a new instance of the LocalMediaCenterService.
+    /// </summary>
+    public LocalMediaCenterService()
+    {
+        Instance = new MediaCenter(DEFAULT_MEDIA_CENTER_NAME);
     }
 }

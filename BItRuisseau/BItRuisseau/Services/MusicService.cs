@@ -1,51 +1,66 @@
-﻿using BitRuisseau.Protocol;
+﻿using BitRuisseau.Models.Protocol;
 
-namespace BitRuisseau.Services
+namespace BitRuisseau.Services;
+
+/// <summary>
+/// Service responsible for retrieving music files from the file system.
+/// </summary>
+public class MusicService
 {
-    public class MusicService
+    private static readonly string[] SUPPORTED_EXTENSIONS =
     {
-        public List<MediaDescription> GetSongs(string folderPath)
+        ".mp3", ".wav", ".flac", ".m4a"
+    };
+
+    /// <summary>
+    /// Retrieves all supported audio files from the given folder.
+    /// </summary>
+    /// <param name="folderPath">Root folder containing music files</param>
+    /// <returns>List of media descriptions</returns>
+    public List<MediaDescription> GetSongs(string folderPath)
+    {
+        if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
         {
-            if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
+            return new List<MediaDescription>();
+        }
+
+        return Directory
+            .GetFiles(folderPath, "*.*", SearchOption.AllDirectories)
+            .Where(file =>
+                SUPPORTED_EXTENSIONS.Contains(
+                    Path.GetExtension(file).ToLower()))
+            .Select(CreateMediaDescription)
+            .ToList();
+    }
+
+    private static MediaDescription CreateMediaDescription(string filePath)
+    {
+        try
+        {
+            var tagFile = TagLib.File.Create(filePath);
+
+            return new MediaDescription
             {
-                return new List<MediaDescription>();
-            }
-
-            string[] extensions = { ".mp3", ".wav", ".flac", ".m4a" };
-
-            return Directory
-                .GetFiles(folderPath, "*.*", SearchOption.AllDirectories)
-                .Where(f => extensions.Contains(Path.GetExtension(f).ToLower()))
-                .Select(file =>
-                {
-                    try
-                    {
-                        var tagFile = TagLib.File.Create(file);
-
-                        return new MediaDescription
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Title = string.IsNullOrWhiteSpace(tagFile.Tag.Title)
-                                ? Path.GetFileNameWithoutExtension(file)
-                                : tagFile.Tag.Title,
-                            Artist = tagFile.Tag.Performers?.FirstOrDefault(),
-                            Duration = tagFile.Properties.Duration,
-                            Year = (int)tagFile.Tag.Year,
-                            Size = tagFile.Length,
-                            FilePath = file
-                        };
-                    }
-                    catch
-                    {
-                        return new MediaDescription
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Title = Path.GetFileNameWithoutExtension(file),
-                            FilePath = file
-                        };
-                    }
-                })
-                .ToList();
+                Id = Guid.NewGuid().ToString(),
+                Title = string.IsNullOrWhiteSpace(tagFile.Tag.Title)
+                    ? Path.GetFileNameWithoutExtension(filePath)
+                    : tagFile.Tag.Title,
+                Artist = tagFile.Tag.Performers?.FirstOrDefault(),
+                Duration = tagFile.Properties.Duration,
+                Year = (int)tagFile.Tag.Year,
+                Size = tagFile.Length,
+                FilePath = filePath
+            };
+        }
+        catch
+        {
+            // If metadata reading fails, fallback to minimal information
+            return new MediaDescription
+            {
+                Id = Guid.NewGuid().ToString(),
+                Title = Path.GetFileNameWithoutExtension(filePath),
+                FilePath = filePath
+            };
         }
     }
 }
