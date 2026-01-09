@@ -4,28 +4,16 @@ namespace BitRuisseau.Services
 {
     public class MusicService
     {
-        public List<MediaDescription> MyMusicList { get; set; } = new();
-        public List<MediaDescription> CurrentMusicList { get; set; } = new();
-
-        public event Action? OnMusicListChanged;
-
-        public void SetCurrentList(List<MediaDescription> list)
-        {
-            CurrentMusicList = list;
-            OnMusicListChanged?.Invoke();
-        }
-
-        public void GetMusics(string folderPath)
+        public List<MediaDescription> GetSongs(string folderPath)
         {
             if (string.IsNullOrWhiteSpace(folderPath) || !Directory.Exists(folderPath))
             {
-                MyMusicList = new();
-                return;
+                return new List<MediaDescription>();
             }
 
             string[] extensions = { ".mp3", ".wav", ".flac", ".m4a" };
 
-            MyMusicList = Directory
+            return Directory
                 .GetFiles(folderPath, "*.*", SearchOption.AllDirectories)
                 .Where(f => extensions.Contains(Path.GetExtension(f).ToLower()))
                 .Select(file =>
@@ -58,7 +46,6 @@ namespace BitRuisseau.Services
                     }
                 })
                 .ToList();
-            CurrentMusicList = MyMusicList;
         }
     }
 }

@@ -1,70 +1,64 @@
 ﻿@inherits LayoutComponentBase
-@inject PlayerService Player
-@inject NavigationManager Navigation
 @inject AgentService AgentService
-@inject MusicService MusicService
+@inject LocalMediaCenterService LocalMediaCenter
+@inject HomePageViewModel ViewModel
 @implements IDisposable
 @using InfiniLore.Lucide
 
 <div class="app-container">
     <header>
         <h1>MediaPlayer</h1>
-        <button @onclick="GoToSettings">Settings</button>
     </header>
 
     <div class="page-container">
         <aside class="sidebar">
             <ul>
-                <li @onclick="() => MusicService.SetCurrentList(MusicService.MyMusicList)">Moi</li>
-                @foreach (MediaCenter node in AgentService.Nodes.ToList())
+                <li @onclick="OnClickMe">Moi</li>
+                @foreach (var node in nodes)
                 {
                     <li @onclick="() => OnUserClicked(node)">@node.Name</li>
                 }
-
             </ul>
         </aside>
 
-        <main>
-            @if (Body != null)
-            {
-                @Body
-            }
-        </main>
+        <main>@Body</main>
     </div>
 
     <footer class="bottom-player">
-        @if (Player.CurrentSong != null)
+        @if (ViewModel.CurrentSong != null)
         {
             <div class="player-left">
                 <div class="album-art-placeholder">
                     <LucideIcon Name="music" size="28" />
                 </div>
                 <div class="song-info">
-                    <div class="song-title">@Player.CurrentSong.Title.Shorten(50)</div>
-                    <div class="song-artist">@string.Join(", ",Player.CurrentSong.Artist)</div>
-                    <div class="song-meta">@Player.CurrentSong.Year |  @Player.Elapsed.ToString(@"mm\:ss") : @Player.CurrentSong.Duration.ToString(@"mm\:ss")</div>
+                    <div class="song-title">@ViewModel.CurrentSong.Title.Shorten(50)</div>
+                    <div class="song-artist">@string.Join(", ", ViewModel.CurrentSong.Artist)</div>
+                    <div class="song-meta">
+                        @ViewModel.CurrentSong.Year | @ViewModel.Elapsed.ToString(@"mm\:ss") : @ViewModel.CurrentSong.Duration.ToString(@"mm\:ss")
+                    </div>
                 </div>
             </div>
 
             <div class="player-center">
-                <button @onclick="Player.PlayPrevious" aria-label="Previous song">
+                <button @onclick="ViewModel.PlayPrevious" aria-label="Previous song">
                     <LucideIcon Name="arrow-left" />
                 </button>
 
-                @if (Player.IsPlaying)
+                @if (ViewModel.IsPlaying)
                 {
-                    <button class="play-button" @onclick="Player.Pause" aria-label="Pause">
+                    <button class="play-button" @onclick="ViewModel.Pause" aria-label="Pause">
                         <LucideIcon Name="pause" />
                     </button>
                 }
                 else
                 {
-                    <button class="play-button" @onclick="() => Player.Play(Player.CurrentSong)" aria-label="Play">
+                    <button class="play-button" @onclick="() => ViewModel.Play(ViewModel.CurrentSong!)" aria-label="Play">
                         <LucideIcon Name="play" />
                     </button>
                 }
 
-                <button @onclick="Player.PlayNext" aria-label="Next song">
+                <button @onclick="ViewModel.PlayNext" aria-label="Next song">
                     <LucideIcon Name="arrow-right" />
                 </button>
             </div>
@@ -74,42 +68,51 @@
             <span>Select a song to play</span>
         }
     </footer>
-
 </div>
 
 @code {
-    private MediaCenter mediaCenter = new MediaCenter("Eithan");
+    private List<MediaCenter> nodes = new();
+    private Action? _playerChangedHandler;
 
-    private void GoToSettings()
-    {
-        Navigation.NavigateTo("/settings");
-    }
     protected override async Task OnInitializedAsync()
     {
-        Player.OnSongChanged += Refresh;
-        Player.OnTimeUpdated += Refresh;
-        AgentService.OnNodesUpdated += Refresh;
-        await AgentService.StartAsync(mediaCenter);
+        _playerChangedHandler = () => InvokeAsync(StateHasChanged);
+        ViewModel.OnPlayerChanged += _playerChangedHandler;
 
+        AgentService.NodesUpdated += OnNodesUpdated;
+        await AgentService.StartAsync(LocalMediaCenter.Instance);
     }
 
-    private void Refresh()
+    private void OnNodesUpdated(object? s, IReadOnlyCollection<MediaCenter> list)
     {
+        nodes = list.ToList();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnClickMe()
+    {
+        ViewModel.CurrentMusicList.Clear();
+        foreach (var song in ViewModel.MyMusicList)
+            ViewModel.CurrentMusicList.Add(song);
+
         InvokeAsync(StateHasChanged);
     }
 
     private async Task OnUserClicked(MediaCenter user)
     {
-        // send catalog request
-        await AgentService.SendEnvelopeAsync(new Envelope(mediaCenter.Id, user.Id, MessageType.CATALOG_REQUEST, ""), AgentService.BASE_TOPIC);
+        await AgentService.SendEnvelopeAsync(
+            new Envelope(LocalMediaCenter.Instance.Id, user.Id, MessageType.CATALOG_REQUEST, ""),
+            AgentService.BASE_TOPIC);
     }
 
     public void Dispose()
     {
-        Player.OnSongChanged -= Refresh;
-        Player.OnTimeUpdated -= Refresh;
-        AgentService.OnNodesUpdated -= Refresh;
+        if (_playerChangedHandler != null)
+        {
+            ViewModel.OnPlayerChanged -= _playerChangedHandler;
+        }
+
+        AgentService.NodesUpdated -= OnNodesUpdated;
         _ = AgentService.StopAsync();
     }
-
 }

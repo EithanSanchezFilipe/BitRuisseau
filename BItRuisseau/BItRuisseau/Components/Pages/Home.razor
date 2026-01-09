@@ -1,84 +1,60 @@
 ﻿@page "/"
+@implements IDisposable
 @inject SettingsService SettingsService
-@inject MusicService MusicService
-@inject PlayerService Player
-@inject AgentService AgentService
+@inject HomePageViewModel ViewModel
+
 <div class="content-page">
-	@if (string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
-	{
-		<p>No folder selected.</p>
-		<button @onclick="SelectFolder">Choose Folder</button>
-	}
-	else
-	{
-		<div class="music-player">
-			<aside class="music-list-grid">
-				@foreach (var song in MusicService.CurrentMusicList)
-				{
-					<div class="song-box @(Player.CurrentSong == song ? "active" : "")"
-						 @onclick="() => SelectSong(song)">
-
-						<div class="song-image-placeholder">
-						</div>
-
-						<p class="songTitle">@song.Title.Shorten(20)</p>
-						<p class="artistName">@string.Join(", ", song.Artist).Shorten(15)</p>
-
-					</div>
-				}
-			</aside>
-
-
-		</div>
-	}
+    @if (string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
+    {
+        <p>No folder selected.</p>
+        <button @onclick="SelectFolder">Choose Folder</button>
+    }
+    else
+    {
+        <div class="music-player">
+            <aside class="music-list-grid">
+                @foreach (var song in ViewModel.CurrentMusicList)
+                {
+                    <div class="song-box @(ViewModel.CurrentSong == song ? "active" : "")"
+                         @onclick="() => ViewModel.Play(song)">
+                        <div class="song-image-placeholder"></div>
+                        <p class="songTitle">@song.Title.Shorten(20)</p>
+                        <p class="artistName">@string.Join(", ", song.Artist).Shorten(15)</p>
+                    </div>
+                }
+            </aside>
+        </div>
+    }
 </div>
 
 @code {
-	protected override async Task OnInitializedAsync()
-	{
-		AgentService.OnMediaListReceived += Refresh;
-		MusicService.OnMusicListChanged += Refresh;
-		LoadSongs();
-		Player.SetPlaylist(MusicService.CurrentMusicList);
-		Player.OnSongChanged += OnSongChanged;
-	}
-		
-	private void Refresh()
-	{
-		InvokeAsync(StateHasChanged);
-	}
+    private Action? _playerChangedHandler;
 
-	private void OnSongChanged()
-	{
-		InvokeAsync(StateHasChanged);
-	}
+    protected override void OnInitialized()
+    {
+        _playerChangedHandler = () => InvokeAsync(StateHasChanged);
+        ViewModel.CurrentMusicList.CollectionChanged += (_, __) => InvokeAsync(StateHasChanged);
+        ViewModel.OnPlayerChanged += _playerChangedHandler;
 
-	private async Task SelectFolder()
-	{
-		bool picked = await SettingsService.PickMusicFolderAsync();
-		if (picked)
-		{
-			LoadSongs();
-			Player.SetPlaylist(MusicService.CurrentMusicList);
-			StateHasChanged();
-		}
-	}
+        if (!string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
+        {
+            ViewModel.LoadSongs(SettingsService.Current.MusicFolderPath);
+        }
+    }
 
-	private void LoadSongs()
-	{
-		if (!string.IsNullOrWhiteSpace(SettingsService.Current.MusicFolderPath))
-		{
-			MusicService.GetMusics(SettingsService.Current.MusicFolderPath);
-		}
-	}
+    private async Task SelectFolder()
+    {
+        bool picked = await SettingsService.PickMusicFolderAsync();
+        if (picked)
+        {
+            ViewModel.LoadSongs(SettingsService.Current.MusicFolderPath);
+            StateHasChanged();
+        }
+    }
 
-	private void SelectSong(MediaDescription song)
-	{
-		Player.Play(song);
-	}
-
-	public void Dispose()
-	{
-		Player.OnSongChanged -= OnSongChanged;
-	}
+    public void Dispose()
+    {
+        ViewModel.OnPlayerChanged -= _playerChangedHandler;
+        ViewModel.Dispose();
+    }
 }

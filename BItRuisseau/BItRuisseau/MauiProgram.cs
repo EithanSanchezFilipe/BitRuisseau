@@ -3,7 +3,7 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
 using DotNetEnv;
 using Microsoft.Extensions.Logging;
-
+using BitRuisseau.ViewModel;
 namespace BitRuisseau
 {
     public static class MauiProgram
@@ -35,8 +35,10 @@ namespace BitRuisseau
                 var mqttService = sp.GetRequiredService<MqttService>();
                 var musicService = sp.GetRequiredService<MusicService>();
 
-                return new AgentService(mqttService, musicService);
+                return new AgentService(mqttService);
             });
+            builder.Services.AddSingleton<HomePageViewModel>();
+            builder.Services.AddSingleton<LocalMediaCenterService>();
             builder.Services.AddLucideIcons();
 
 #if DEBUG
