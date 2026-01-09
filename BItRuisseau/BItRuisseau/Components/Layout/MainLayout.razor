@@ -2,6 +2,7 @@
 @inject AgentService AgentService
 @inject LocalMediaCenterService LocalMediaCenter
 @inject HomePageViewModel ViewModel
+@inject NavigationManager Navigation
 @implements IDisposable
 @using BitRuisseau.Models.Protocol
 @using InfiniLore.Lucide
@@ -9,6 +10,7 @@
 <div class="app-container">
     <header>
         <h1>MediaPlayer</h1>
+        <button @onclick="GoToSettings">Settings</button>
     </header>
 
     <div class="page-container">
@@ -132,5 +134,10 @@
 
         AgentService.NodesUpdated -= OnNodesUpdated;
         _ = AgentService.StopAsync();
+    }
+
+    private void GoToSettings()
+    {
+        Navigation.NavigateTo("/settings");
     }
 }
