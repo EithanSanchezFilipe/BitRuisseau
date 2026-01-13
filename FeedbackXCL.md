@@ -35,3 +35,10 @@
   - Quelques points à corriger
   - Adaptations + UI à faire pour le challenge
   - Une petite discussion à avoir
+
+## Finale
+
+- Jokers: OK-3
+- Document usage IA: OK
+- Livraison: contenu OK, notification OK
+- Jdt: Ok, bien que lacunaire sur la fin
